@@ -1,0 +1,6 @@
+{
+  "name": "Noise Generation - Official 3D Artist Portfolio",
+  "description": "Interactive 3D artist portfolio for underground Progressive House & Melodic Techno DJ/producer Noise Generation (Pradeep Dissanayaka), founder of Noise in Harmony Records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
