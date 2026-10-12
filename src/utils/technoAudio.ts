@@ -105,6 +105,19 @@ class ProgressiveAudioEngine {
     }
   }
 
+  private listeners: Set<(playing: boolean) => void> = new Set();
+
+  public subscribe(listener: (playing: boolean) => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private notify() {
+    this.listeners.forEach((l) => l(this.isPlaying));
+  }
+
   public start() {
     this.init();
     if (!this.ctx || !this.masterGain || this.isPlaying) return;
@@ -113,6 +126,7 @@ class ProgressiveAudioEngine {
 
     const stepInterval = (60 / this.bpm / 4) * 1000; // 16th notes
     this.timerId = window.setInterval(() => this.tick(), stepInterval);
+    this.notify();
   }
 
   public stop() {
@@ -121,6 +135,7 @@ class ProgressiveAudioEngine {
       clearInterval(this.timerId);
       this.timerId = null;
     }
+    this.notify();
   }
 
   public getIsPlaying(): boolean {

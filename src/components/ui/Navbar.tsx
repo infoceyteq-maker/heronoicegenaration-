@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Menu, X, Disc3 } from 'lucide-react';
-import { technoAudio } from '@/utils/technoAudio';
+import { Volume2, VolumeX, Menu, X } from 'lucide-react';
+import { ARTIST_DATA } from '@/lib/constants';
 
 interface NavbarProps {
   isPlayingAudio: boolean;
@@ -13,17 +13,28 @@ export default function Navbar({ isPlayingAudio, onToggleAudio }: NavbarProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      setIsScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Keyboard accessibility: Close mobile drawer on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { label: 'About', href: '#about' },
-    { label: 'Discography', href: '#labels' },
-    { label: 'Imprint', href: '#record-label' },
-    { label: 'Music', href: '#streaming' },
+    { label: 'Labels', href: '#labels' },
+    { label: 'Record Label', href: '#record-label' },
+    { label: 'Streaming', href: '#streaming' },
     { label: 'Booking', href: '#booking' },
   ];
 
@@ -31,60 +42,69 @@ export default function Navbar({ isPlayingAudio, onToggleAudio }: NavbarProps) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#030305]/90 backdrop-blur-md border-b border-slate-800/80 shadow-2xl py-3'
+          ? 'bg-[#050508]/92 backdrop-blur-md border-b border-white/10 shadow-2xl py-3.5'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
-        {/* Zone 1: Brand Wordmark (Strict 1-line display face element) */}
+        {/* Brand Wordmark & Label Tag */}
         <a
           href="#"
-          className="font-orbitron font-extrabold text-base sm:text-lg tracking-[0.2em] text-white hover:text-[#00f2fe] transition-colors whitespace-nowrap shrink-0 flex items-center gap-2.5 group"
+          className="group flex flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-sm"
+          aria-label="Noise Generation Home"
         >
-          <span className="w-2.5 h-2.5 bg-gradient-to-tr from-[#00f2fe] to-[#7f00ff] rounded-xs rotate-45 group-hover:scale-125 transition-transform shadow-[0_0_10px_#00f2fe]" />
-          <span>NOISE GENERATION</span>
+          <span className="font-orbitron font-black text-lg sm:text-xl tracking-[0.2em] text-white group-hover:text-amber-400 transition-colors uppercase whitespace-nowrap">
+            {ARTIST_DATA.name}
+          </span>
+          <span className="font-mono text-[10px] text-slate-400 tracking-[0.25em] uppercase font-semibold">
+            {ARTIST_DATA.label}
+          </span>
         </a>
 
-        {/* Zone 2: 4-5 Concise Single-line Nav Links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-rajdhani font-semibold tracking-wider text-slate-300">
+        {/* Desktop Nav Links */}
+        <nav
+          className="hidden md:flex items-center gap-7 text-xs font-mono font-bold tracking-[0.18em] text-slate-300"
+          aria-label="Main Navigation"
+        >
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="hover:text-[#00f2fe] transition-colors whitespace-nowrap shrink-0 uppercase relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-[#00f2fe] hover:after:w-full after:transition-all after:duration-200"
+              className="hover:text-white transition-colors uppercase relative py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xs"
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        {/* Zone 3: Primary Action & Audio Visualizer Trigger */}
+        {/* Action Controls: Audio Engine Trigger & Booking CTA */}
         <div className="flex items-center gap-3 shrink-0">
-          {/* Audio Synthesizer Trigger Button */}
+          {/* Audio Synthesizer Toggle */}
           <button
+            type="button"
             onClick={onToggleAudio}
-            className={`px-3.5 py-1.5 rounded-lg border text-xs font-mono font-medium tracking-wider flex items-center gap-2 transition-all ${
+            className={`px-3.5 py-1.5 rounded-full border text-xs font-mono font-semibold tracking-wider flex items-center gap-2 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
               isPlayingAudio
-                ? 'bg-[#00f2fe]/10 border-[#00f2fe] text-[#00f2fe] shadow-[0_0_15px_rgba(0,242,254,0.35)]'
-                : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.35)]'
+                : 'bg-black/60 border-white/20 text-slate-300 hover:text-white hover:border-white/50'
             }`}
-            title={isPlayingAudio ? 'Mute 123 BPM Progressive Engine' : 'Trigger 123 BPM Progressive Techno Engine'}
-            aria-label="Toggle progressive techno audio"
+            title={isPlayingAudio ? 'Pause 123 BPM Progressive House' : 'Play 123 BPM Progressive House'}
+            aria-label={isPlayingAudio ? 'Pause 123 BPM progressive techno audio' : 'Play 123 BPM progressive techno audio'}
           >
             {isPlayingAudio ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-[#00f2fe] animate-pulse" />
-                <span className="hidden sm:inline">123 BPM</span>
-                <span className="flex items-center gap-0.5 h-3">
-                  <span className="w-0.5 h-2 bg-[#00f2fe] animate-pulse" />
-                  <span className="w-0.5 h-3 bg-[#7f00ff] animate-ping" />
-                  <span className="w-0.5 h-1.5 bg-[#00f2fe] animate-pulse" />
+                <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                <span className="hidden sm:inline">123 BPM ACTIVE</span>
+                <span className="flex items-center gap-0.5 h-3" aria-hidden="true">
+                  <span className="w-0.5 h-2.5 bg-amber-400 animate-pulse" />
+                  <span className="w-0.5 h-3.5 bg-amber-300 animate-bounce" />
+                  <span className="w-0.5 h-1.5 bg-amber-400 animate-pulse" />
                 </span>
               </>
             ) : (
               <>
                 <VolumeX className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">AUDIO OFF</span>
+                <span className="hidden sm:inline">SOUND: OFF</span>
               </>
             )}
           </button>
@@ -92,42 +112,48 @@ export default function Navbar({ isPlayingAudio, onToggleAudio }: NavbarProps) {
           {/* Primary CTA */}
           <a
             href="#booking"
-            className="hidden sm:inline-flex px-4 py-1.5 text-xs font-orbitron font-bold text-black bg-[#00f2fe] hover:bg-white hover:shadow-[0_0_20px_#00f2fe] rounded-lg transition-all tracking-wider whitespace-nowrap shrink-0"
+            className="hidden sm:inline-flex px-5 py-2 text-xs font-mono font-bold text-black bg-white hover:bg-slate-200 rounded-full transition-all uppercase tracking-wider shadow-sm hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
           >
             BOOK ARTIST
           </a>
 
-          {/* Mobile menu hamburger */}
+          {/* Mobile Menu Hamburger Button */}
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg border border-slate-800"
-            aria-label="Toggle mobile menu"
+            className="md:hidden p-2 text-slate-300 hover:text-white rounded-lg border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Accessible Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#030305]/95 backdrop-blur-xl border-b border-slate-800 px-6 py-5 space-y-4">
-          <nav className="flex flex-col gap-3 font-rajdhani text-base font-semibold tracking-wider">
+        <div
+          id="mobile-nav-menu"
+          className="md:hidden bg-[#07070c]/98 backdrop-blur-2xl border-b border-white/10 px-6 py-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-200"
+        >
+          <nav className="flex flex-col gap-2 font-mono text-sm font-semibold tracking-wider" aria-label="Mobile Navigation">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-slate-300 hover:text-[#00f2fe] py-2 border-b border-slate-900 uppercase"
+                className="text-slate-200 hover:text-amber-400 py-2.5 border-b border-white/5 uppercase transition-colors"
               >
                 {link.label}
               </a>
             ))}
           </nav>
-          <div className="pt-2 flex flex-col gap-2.5">
+          <div className="pt-2 flex flex-col gap-3">
             <a
               href="#booking"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-2.5 text-center text-xs font-orbitron font-bold text-black bg-[#00f2fe] rounded-lg"
+              className="w-full py-3 text-center text-xs font-mono font-bold text-black bg-white rounded-full uppercase tracking-wider shadow-md"
             >
               BOOK NOISE GENERATION
             </a>
