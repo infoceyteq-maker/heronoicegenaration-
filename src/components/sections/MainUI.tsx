@@ -1,4 +1,4 @@
-'use client';
+
 
 import React from 'react';
 import { Play, Mail, Music, Disc, Youtube, Facebook } from 'lucide-react';
